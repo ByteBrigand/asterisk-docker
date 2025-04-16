@@ -22,10 +22,8 @@ RUN apt install -y \
     pkg-config \
     libedit-dev
 
-RUN (wget -6 http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.tar.gz || \
-     wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.tar.gz) && \
-    (wget -6 http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.md5 || \
-     wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.md5) && \
+RUN wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.tar.gz && \
+    wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-${ASTERISK_VERSION}.md5 && \
     md5sum -c asterisk-${ASTERISK_VERSION}.md5
 RUN tar zxvf asterisk-${ASTERISK_VERSION}.tar.gz && \
     rm asterisk-${ASTERISK_VERSION}.tar.gz
