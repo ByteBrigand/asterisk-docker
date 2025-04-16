@@ -1,5 +1,4 @@
-# Stage 1:
-FROM debian:bookworm-slim AS build
+FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ASTERISK_VERSION=22.3.0
@@ -44,13 +43,22 @@ RUN make samples
 RUN make config
 RUN make install-logrotate
 
-# Stage 2
-FROM debian:bookworm-slim
+# cleanup
+RUN make dist-clean
+RUN rm -rf /usr/src/asterisk-${ASTERISK_VERSION}
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV ASTERISK_VERSION=22.3.0
-
-RUN apt update && apt upgrade -y
+RUN apt purge -y \
+    build-essential \
+    wget \
+    subversion \
+    libncurses5-dev \
+    libssl-dev \
+    libxml2-dev \
+    libsqlite3-dev \
+    uuid-dev \
+    libjansson-dev \
+    pkg-config \
+    libedit-dev
 RUN apt autoremove -y
 RUN apt clean
 RUN rm -rf /var/lib/apt/lists/*
@@ -60,12 +68,6 @@ RUN groupadd --system asterisk
 RUN useradd --system --no-create-home --gid asterisk asterisk
 
 RUN mkdir -p /var/lib/asterisk /var/log/asterisk /var/spool/asterisk /etc/asterisk
-
-COPY --from=build /usr/lib /usr/lib
-COPY --from=build /usr/sbin /usr/sbin
-COPY --from=build /var /var
-COPY --from=build /etc/asterisk /etc/asterisk
-
 RUN chown -R asterisk:asterisk /var/lib/asterisk
 RUN chown -R asterisk:asterisk /var/log/asterisk
 RUN chown -R asterisk:asterisk /var/spool/asterisk
